@@ -17,7 +17,6 @@ int libraryCallback(struct dl_phdr_info* info, size_t size, void* data) {
     const char* libraryName = "libGameLogic.so";  // Replace with the name of the original library
     if (strstr(info->dlpi_name, libraryName) != NULL) {
         *(void**)data = dlopen(libraryName, RTLD_LAZY);
-		printf("[%p]\n", *(void**)data);
 		return 1; // Stop iterating after finding the desired library
 	}
     return 0;  // Continue iterating
@@ -98,7 +97,7 @@ void initSharedLib()
         // Cleanup and return or handle the error accordingly
         return;
     }
-    printf("(PWNED)[+] :Start Address of the : %p\n", handle);
+    printf("(PWNED)[+] : Handle Address is : %p\n", handle);
 
         
 
