@@ -76,10 +76,5 @@ int main()
     }
 	printf("[+] Shared library successfully injected to pid %d !\n", pid);
 	
-	if (injector_uninject(injector, handle) != 0) {
-        printf("[+] UNINJECT ERROR: %s\n", injector_error());
-    }
-	printf("[+] Successfully uninjected the shared library from pid %d !\n", pid);
-
 	injector_detach(injector);
 }
