@@ -1,0 +1,47 @@
+#include "libGameLogic.h"
+#include <cstddef>
+#include <cstdio>
+#include <dlfcn.h>
+#include <functional>
+
+extern "C" ClientWorld *GameWorld;
+
+void Player::SetJumpState(bool b)
+{
+	printf("Fooled !\n");
+};
+Player::Player() : Actor("Chris")
+{
+
+}
+void loadMsg(void)
+{
+	printf("libGameLogic.so patcher loaded !\n");
+}
+
+void jump(bool state)
+{
+
+}
+__attribute__((constructor))
+void initSharedLib()
+{
+
+	auto jumpStateWrapper = [&GameWorld](bool state) (
+
+			)
+	loadMsg();
+	IPlayer *currentPlayer = GameWorld->m_activePlayer.m_object;
+	Player *player = (Player*)currentPlayer;
+	printf("Setting player speed to 1000\n");
+	player->m_walkingSpeed = 1000;
+	printf("Setting player jump speed to 1000\n");
+	player->m_jumpSpeed = 1000;
+	printf("Setting player jump hold time  to 1000\n");
+	player->m_jumpHoldTime = 1000;
+	printf("Setting health to 1000\n");
+	player->m_health  = 1000;
+	printf("Setting regen cooldown and regen timer to 0 (GOD MODE)\n");
+	player->m_healthRegenCooldown = 0;
+	player->m_healthRegenTimer = 0;
+	void (Player::*functionPtr)(bool) = &Player::SetJumpState;
