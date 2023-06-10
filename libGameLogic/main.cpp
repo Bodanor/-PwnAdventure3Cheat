@@ -10,11 +10,18 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+
+extern "C" ClientWorld *GameWorld;
+
 using namespace std;
 
+void SpeedHack(void);
+void trampoline_SetJumpState(bool state);
+int libraryCallback(struct dl_phdr_info *info, size_t size, void *data);
 
-int libraryCallback(struct dl_phdr_info* info, size_t size, void* data) {
-    const char* libraryName = "libGameLogic.so";  // Replace with the name of the original library
+int libraryCallback(struct dl_phdr_info *info, size_t size, void *data)
+{
+	const char* libraryName = "libGameLogic.so";  // Replace with the name of the original library
     if (strstr(info->dlpi_name, libraryName) != NULL) {
         *(void**)data = dlopen(libraryName, RTLD_LAZY);
 		return 1; // Stop iterating after finding the desired library
@@ -22,14 +29,23 @@ int libraryCallback(struct dl_phdr_info* info, size_t size, void* data) {
     return 0;  // Continue iterating
 }
 
-void trampoline_SetJumpState(bool state);
 void trampoline_SetJumpState(bool state)
 {
     printf("PWNED !!!\n");
 }
 
+bool InfiniteJump()
+{
+	return 1;
+}
 
-
+void SpeedHack(void)
+{
+	
+	IPlayer *currentPlayer = GameWorld->m_activePlayer.m_object;
+	Player *player = (Player*)currentPlayer;
+	player->m_walkingSpeed = 1000;
+}
 void* createTrampoline(void* handle, const char* symbol, void* replacementFunction)
 {
     // Find the symbol address
@@ -101,6 +117,7 @@ void initSharedLib()
 
         
 
+	/* Replace the jumpState Function */
 	void* trampoline = createTrampoline(handle, "_ZN6Player12SetJumpStateEb", (void*)&trampoline_SetJumpState);
     if (!trampoline)
     {
@@ -109,6 +126,18 @@ void initSharedLib()
         dlclose(handle);
         return;
     }
+	trampoline = createTrampoline(handle, "_ZN6Player7CanJumpEv", (void*)&InfiniteJump);
+    if (!trampoline)
+    {
+        // Handle error if trampoline setup fails
+        std::cerr << "(PWNED)[-] : Failed to create trampoline." << std::endl;
+        dlclose(handle);
+        return;
+    }
+
+	/* Enable speed Hack */
+	SpeedHack();
+	printf("(PWNED)[+] : Speedhack ENABLED !\n");
 
 	printf("(PWNED)[+] : libGameLogic.so loaded successfully !\n");
 	printf("(PWNED)[++++] BY Christos.P (Liwinux) : The Game got PWNED !!!!\n");
